@@ -85,10 +85,12 @@ Camera.style = {
 }
 
 local function new(x, y, w, h, scale, rotation)
+    x = x or (w or love.graphics.getWidth())/2
+    y = y or (h or love.graphics.getHeight())/2
     return setmetatable({
-        x = x or (w or love.graphics.getWidth())/2, y = y or (h or love.graphics.getHeight())/2,
-        mx = x or (w or love.graphics.getWidth())/2, my = y or (h or love.graphics.getHeight())/2,
-        screen_x = x or (w or love.graphics.getWidth())/2, screen_y = y or (h or love.graphics.getHeight())/2,
+        x = x, y = y,
+        mx = x, my = y,
+        screen_x = x, screen_y = y,
         w = w or love.graphics.getWidth(), h = h or love.graphics.getHeight(),
         scale = scale or 1,
         rotation = rotation or 0,
