@@ -75,6 +75,15 @@ end
 local Camera = {}
 Camera.__index = Camera
 
+Camera.style = {
+    LOCKON = 1,
+    PLATFORMER = 2,
+    TOPDOWN = 3,
+    TOPDOWN_TIGHT = 4,
+    SCREEN_BY_SCREEN = 5,
+    NO_DEADZONE = 6,
+}
+
 local function new(x, y, w, h, scale, rotation)
     return setmetatable({
         x = x or (w or love.graphics.getWidth())/2, y = y or (h or love.graphics.getHeight())/2,
@@ -187,26 +196,26 @@ function Camera:update(dt)
     if not self.target_x and not self.target_y then return end
 
     -- Set follow style deadzones
-    if self.follow_style == 'LOCKON' then
+    if self.follow_style == Camera.style.LOCKON then
         local w, h = self.w/16, self.w/16
         self:setDeadzone((self.w - w)/2, (self.h - h)/2, w, h)
 
-    elseif self.follow_style == 'PLATFORMER' then
+    elseif self.follow_style == Camera.style.PLATFORMER then
         local w, h = self.w/8, self.h/3
         self:setDeadzone((self.w - w)/2, (self.h - h)/2 - h*0.25, w, h)
 
-    elseif self.follow_style == 'TOPDOWN' then
+    elseif self.follow_style == Camera.style.TOPDOWN then
         local s = math.max(self.w, self.h)/4
         self:setDeadzone((self.w - s)/2, (self.h - s)/2, s, s)
 
-    elseif self.follow_style == 'TOPDOWN_TIGHT' then
+    elseif self.follow_style == Camera.style.TOPDOWN_TIGHT then
         local s = math.max(self.w, self.h)/8
         self:setDeadzone((self.w - s)/2, (self.h - s)/2, s, s)
 
-    elseif self.follow_style == 'SCREEN_BY_SCREEN' then
+    elseif self.follow_style == Camera.style.SCREEN_BY_SCREEN then
         self:setDeadzone(0, 0, 0, 0)
 
-    elseif self.follow_style == 'NO_DEADZONE' then
+    elseif self.follow_style == Camera.style.NO_DEADZONE then
         self.deadzone = nil
     end
 
@@ -227,7 +236,7 @@ function Camera:update(dt)
     local x, y = self:toCameraCoords(self.x, self.y)
 
     -- Screen by screen follow mode needs to be handled a bit differently
-    if self.follow_style == 'SCREEN_BY_SCREEN' then
+    if self.follow_style == Camera.style.SCREEN_BY_SCREEN then
         -- Don't change self.screen_x/y if already at the boundaries
         if self.bound then
             if self.x > self.bounds_min_x + self.w/2 and target_x < 0 then self.screen_x = csnap(self.screen_x - self.w/self.scale, self.w/self.scale) end
@@ -337,6 +346,7 @@ function Camera:setBounds(x, y, w, h)
 end
 
 function Camera:setFollowStyle(follow_style)
+    assert(type(follow_style) == 'number', "Set follow style from Camera.style")
     self.follow_style = follow_style
 end
 
