@@ -3,9 +3,6 @@
 
 local Camera = require('Camera')
 
-local canvas
-local window_dimensions = {800,600}
-local canvas_dimensions = {400,300}
 local camera,style_names
 local world_dimensions = {1600,1200}
 local is_faded = false
@@ -57,11 +54,7 @@ end
 
 
 function love.load()
-    -- scale everything with nearest neighbor for sharp pixels
-    love.graphics.setDefaultFilter('nearest', 'nearest')
-    canvas = love.graphics.newCanvas(unpack(canvas_dimensions))
-    camera = Camera(200, 150, unpack(canvas_dimensions))
-    love.window.setMode(unpack(window_dimensions))
+    camera = Camera()
 
     style_names = {}
     for k, v in pairs(camera.style) do style_names[v] = k end
@@ -184,22 +177,13 @@ local function draw_game()
 end
 
 function love.draw()
-    love.graphics.setCanvas(canvas)
     love.graphics.clear()
     camera:attach() do
         -- ## Draw the game here ##
         draw_game()
     end camera:detach()
     camera:draw() -- Must call this to use camera:fade!
-    love.graphics.setCanvas()
     
-    -- Draw the 400x300 canvas scaled by 2 to a 800x600 screen
-    -- This "Pixel Camera" setup doesn't work with toCameraCoords, toWorldCoords, getMousePosition.
-    love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.setBlendMode('alpha', 'premultiplied')
-    love.graphics.draw(canvas, 0, 0, 0, 2, 2)
-    love.graphics.setBlendMode('alpha')
-
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.printf(style_to_name(camera.follow_style), 0,0, 1000)
     love.graphics.printf("Physics: " .. (has_gravity and "Platformer" or "TopDown"), 0,20, 1000)

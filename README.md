@@ -385,6 +385,11 @@ they should match the base resolution. If those arguments are omitted then it wi
 by the `love.graphics.getWidth` and `love.graphics.getHeight` calls. In a pixel setup like this omitting those values is 
 problematic because then the camera would assume an internal resolution of `800x600` which would make everything not work properly.
 
+**NOTE**: This "Pixel Camera" setup doesn't work with toCameraCoords,
+toWorldCoords, and getMousePosition. Since the canvas scaling is applied outside of
+the camera, that transformation also needs to be applied to these positions
+outside of the camera.
+
 <br>
 
 ## Fixed Timestep
