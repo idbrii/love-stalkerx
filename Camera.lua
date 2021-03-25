@@ -102,9 +102,7 @@ local function new(x, y, w, h, scale, rotation)
         follow_lead_x = 0, follow_lead_y = 0,
         deadzone = nil, bound = nil,
         draw_deadzone = false,
-        flash_duration = 1, flash_timer = 0, flash_color = {0, 0, 0, 1},
         last_horizontal_shake_amount = 0, last_vertical_shake_amount = 0,
-        fade_duration = 1, fade_timer = 0, fade_color = {0, 0, 0, 0},
     }, Camera)
 end
 
@@ -152,31 +150,6 @@ end
 
 function Camera:update(dt)
     self.mx, self.my = self:toWorldCoords(love.mouse.getPosition())
-
-    -- Flash --
-    if self.flashing then
-        self.flash_timer = self.flash_timer + dt
-        if self.flash_timer > self.flash_duration then
-            self.flash_timer = 0
-            self.flashing = false
-        end
-    end
-
-    -- Fade --
-    if self.fading then
-        self.fade_timer = self.fade_timer + dt
-        self.fade_color = {
-            lerp(self.base_fade_color[1], self.target_fade_color[1], self.fade_timer/self.fade_duration),
-            lerp(self.base_fade_color[2], self.target_fade_color[2], self.fade_timer/self.fade_duration),
-            lerp(self.base_fade_color[3], self.target_fade_color[3], self.fade_timer/self.fade_duration),
-            lerp(self.base_fade_color[4], self.target_fade_color[4], self.fade_timer/self.fade_duration),
-        }
-        if self.fade_timer > self.fade_duration then
-            self.fade_timer = 0
-            self.fading = false
-            if self.fade_action then self.fade_action() end
-        end
-    end
 
     -- Shake --
     local horizontal_shake_amount, vertical_shake_amount = 0, 0
@@ -313,18 +286,6 @@ function Camera:draw()
         love.graphics.line(self.deadzone_x + self.deadzone_w, self.deadzone_y, self.deadzone_x + self.deadzone_w, self.deadzone_y + 6)
         love.graphics.setLineWidth(n)
     end
-
-    if self.flashing then
-        local r, g, b, a = love.graphics.getColor()
-        love.graphics.setColor(self.flash_color)
-        love.graphics.rectangle('fill', 0, 0, self.w, self.h)
-        love.graphics.setColor(r, g, b, a)
-    end
-
-    local r, g, b, a = love.graphics.getColor()
-    love.graphics.setColor(self.fade_color)
-    love.graphics.rectangle('fill', 0, 0, self.w, self.h)
-    love.graphics.setColor(r, g, b, a)
 end
 
 function Camera:follow(x, y)
@@ -360,22 +321,6 @@ end
 function Camera:setFollowLead(x, y)
     self.follow_lead_x = x
     self.follow_lead_y = y or x
-end
-
-function Camera:flash(duration, color)
-    self.flash_duration = duration
-    self.flash_color = color or self.flash_color
-    self.flash_timer = 0
-    self.flashing = true
-end
-
-function Camera:fade(duration, color, action)
-    self.fade_duration = duration
-    self.base_fade_color = self.fade_color
-    self.target_fade_color = color 
-    self.fade_timer = 0
-    self.fade_action = action
-    self.fading = true
 end
 
 return setmetatable({new = new}, {__call = function(_, ...) return new(...) end})
